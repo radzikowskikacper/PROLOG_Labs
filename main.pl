@@ -8,7 +8,31 @@ choose_goal(Goal, [Goal | Rest], Rest, InitState) :-
 	
 choose_goal(Goal, [ _ | Rest], NewRest, InitState) :- 
 	choose_goal(Goal, Rest, NewRest, InitState).
+
 	
+	
+	
+	
+achieves(move(X, Z, Y), on(X, Y)).
+
+achieves(move(X, Z, Y), on(X, Y / on(Y, P))).
+
+achieves(move(Y, X, Z), clean(X)):-
+  atomic(X).
+
+achieves(move(P, X, R), clean(X / on(X, Y))):-
+  not(atomic(X)).
+	
+%requires(move(X, Y, Z), [clean(X), clean(Z)]):-
+%  not(atomic(Y)).
+
+%requires(move(X, Y, Z), [clean(X), clean(Z)]):-
+ % atomic(Y).
+
+
+
+
+
 	
 goals_achieved([], _).
 
