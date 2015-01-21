@@ -22,13 +22,16 @@ achieves(move(Y, X, Z), clean(X)):-
 
 achieves(move(P, X, R), clean(X / on(X, Y))):-
   not(atomic(X)).
-	
-%requires(move(X, Y, Z), [clean(X), clean(Z)]):-
-%  not(atomic(Y)).
 
-%requires(move(X, Y, Z), [clean(X), clean(Z)]):-
- % atomic(Y).
+  
+requires(move(X, Y, Z), [clean(X), clean(Z)], _):-
+  atomic(X),!.
 
+requires(move(X, Y, Z), [clean(X / on(X, Y), clean(Z / nil)], _):-
+  atomic(Y).
+
+requires(move(X, Y, Z), [clean(X / on(X, Y / on(Y, Target))), clean(Z / nil)], Target):-
+  not(atomic(Y)).
 
 
 
@@ -43,7 +46,7 @@ goals_achieved([G|R], State) :-
 check_goal(G, State):-
 	parse(G, GList),
 	%writeln(GList),
-	subset(GList, State).
+	subset(GList, State). 
 
 parse(nill, []).	
 parse(clean(X), [clean(X)]).
