@@ -27,21 +27,21 @@ choose_goal(Goal, [ PrevGoal | Rest ], [ PrevGoal | NewRest ], InitState) :-
 % END niedeterministyczny wybór celu	
 	
 
-achieves(move(X, _, Y), on(X, Y)).
+achieves(move(X, _, Y), on(X, Y), _).
 
-achieves(move(X, A, Y), on(X, Y / on(Y, A))).
+achieves(move(X, _, Y), on(X, Y / on(Y, _)), _).
 
-achieves(move(_, X, _), clear(X)):-
+achieves(move(_, X, _), clear(X), _):-
   atomic(X).
 
-achieves(move(_, X, _), clear(X / on(X, _))):-
+achieves(move(_, X, _), clear(X / on(X, Y)), Y):-
   not(atomic(X)).
 
   
-requires(move(X, A, Z), [clear(X), clear(Z), on(X, A)], A):-
-  atomic(X),!.
+requires(move(X, _, Z), [clear(X), clear(Z)], _):-
+  atomic(X), atomic(Z), !.
 
-requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / nill)], Y):-
+requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / nill)], _):-
   atomic(Y).
 
 requires(move(X, Y, Z), [clear(X / on(X, Y / on(Y, Target))), clear(Z / nill)], Target):-
@@ -96,10 +96,10 @@ plan(InitState, Goals, Plan, FinalState, Int):-
 	choose_goal(Goal, Goals, RestGoals, InitState),
 	
 	writeln('procedura achives->'),
-	achieves(Action, Goal),
+	achieves(Action, Goal, Addit),
 	
 	writeln('procedura requires->'),
-	requires(Action, Conditions, _),
+	requires(Action, Conditions, Addit),
 	
 	writeln('procedura plan-1->'),
 	plan(InitState, Conditions, PrePlan, MidState1, NewInt),
