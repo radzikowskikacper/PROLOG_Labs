@@ -61,15 +61,19 @@ check_goal(G, State):-
 	writeln(GList),
 	subset(GList, State). 
 
-parse(nill, []).	
-parse(clear(X), [clear(X)]).
-parse(on(X, Y),  [on(X, Y)]).
-	
+parse(nill, []).
+
 parse(clear(X/C), [clear(X) | Rest]) :-
-	parse(C, Rest).
+  nonvar(C),!,
+  parse(C, Rest).
+
+parse(clear(X), [clear(X)]).
 
 parse(on(X, Y/C),  [on(X, Y) | Rest]) :-
-	parse(C, Rest).
+  nonvar(C),!,
+  parse(C, Rest).
+
+parse(on(X, Y),  [on(X, Y)]).
 
 
 perform_action(PrevState, move(X, Y, Z), NextState) :- 
