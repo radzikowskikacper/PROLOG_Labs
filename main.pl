@@ -101,9 +101,11 @@ plan(InitState, Goals, Plan, FinalState, Int):-
 	
 	writeln('procedura achives->'),
 	achieves(Action, Goal, Addit),
+	writeln(Action),
 	
 	writeln('procedura requires->'),
 	requires(Action, Conditions, Addit),
+	
 	
 	writeln('procedura plan-1->'),
 	plan(InitState, Conditions, PrePlan, MidState1, NewInt),
