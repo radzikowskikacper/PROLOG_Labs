@@ -77,8 +77,8 @@ parse(on(X, Y),  [on(X, Y)]).
 
 my_subset([], _) :- !.
 my_subset(GList, State):-
-	get-any(A, Glist, GRest),
-	gest-any(B, State, SRest),
+	get-any(A, GList, GRest),
+	get-any(B, State, SRest),
 	A = B,
 	my_subset(GRest, SRest).
 
