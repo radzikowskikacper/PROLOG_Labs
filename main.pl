@@ -101,7 +101,8 @@ plan(InitState, Goals, Plan, FinalState, Int):-
 	
 	writeln('procedura requires->'),
 	requires(Action, Conditions, Addit),
-	
+	write('Pod-Cele: '),
+	writeln(Conditions),
 	
 	writeln('procedura plan-1->'),
 	plan(InitState, Conditions, PrePlan, MidState1, NewInt),
@@ -109,6 +110,8 @@ plan(InitState, Goals, Plan, FinalState, Int):-
 	writeln('procedura perform_action->'),
 	perform_action(MidState1, Action, MidState2),
 	
+	write('Reszta Celów: '),
+	writeln(RestGoals),
 	writeln('procedura plan-2->'),
 	plan(MidState2, RestGoals, PostPlan, FinalState, NewInt),
 	
