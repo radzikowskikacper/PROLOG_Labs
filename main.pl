@@ -47,19 +47,18 @@ requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / nill)], _):-
 requires(move(X, Y, Z), [clear(X / on(X, Y / on(Y, Target))), clear(Z / nill)], Target):-
   not(atomic(Y)).
 
-  
-goals_achieved([], _):- writeln('goals_achieved = ok').
-
-goals_achieved([G|R], State) :-
-	check_goal(G, State),
-	goals_achieved(R, State).
-
-check_goal(G, State):-
-	writeln('procedura check_goal->'),
+goals_achieved(Goals, State) :-
+	check_goal(Goals, NewGoals),
+	my_subset(NewGoals, State),
+    writeln('goals_achieved - ok').
+	
+check_goal([], _):-!.
+check_goal([G|Rest], NewGoals):-
 	parse(G, GList),
-	write('Lista: '),
-	writeln(GList),
-	my_subset(GList, State). 
+	check_goal(Rest, RestNewGoals),
+	append(GList, RestNewGoals, NewGoals).
+	
+	 
 
 parse(nill, []).
 
@@ -76,11 +75,10 @@ parse(on(X, Y/C),  [on(X, Y) | Rest]) :-
 parse(on(X, Y),  [on(X, Y)]).
 
 my_subset([], _) :- !.
-my_subset(GList, State):-
-	get-any(A, GList, GRest),
+my_subset([A|GList], State):-
 	get-any(B, State, SRest),
 	A = B,
-	my_subset(GRest, SRest).
+	my_subset(GList, SRest).
 
 get-any(A, [A | Rest], Rest).
 get-any(A, [RItem | List], [RItem |NewRest] ) :- get-any(A, List, NewRest).
