@@ -41,7 +41,7 @@ achieves(move(_, X, _), clear(X / on(X, _))):-
 requires(move(X, A, Z), [clear(X), clear(Z), on(X, A)], A):-
   atomic(X),!.
 
-requires(move(X, Y, Z), [clear(X / on(X, Y), clear(Z / nill))], Y):-
+requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / nill)], Y):-
   atomic(Y).
 
 requires(move(X, Y, Z), [clear(X / on(X, Y / on(Y, Target))), clear(Z / nill)], Target):-
