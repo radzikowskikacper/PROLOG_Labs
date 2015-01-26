@@ -59,7 +59,7 @@ check_goal(G, State):-
 	parse(G, GList),
 	write('Lista: '),
 	writeln(GList),
-	subset(GList, State). 
+	my_subset(GList, State). 
 
 parse(nill, []).
 
@@ -75,7 +75,16 @@ parse(on(X, Y/C),  [on(X, Y) | Rest]) :-
 
 parse(on(X, Y),  [on(X, Y)]).
 
+my_subset([], _) :- !.
+my_subset(GList, State):-
+	get-any(A, Glist, GRest),
+	gest-any(B, State, SRest),
+	A = B,
+	my_subset(GRest, SRest).
 
+get-any(A, [A | Rest], Rest).
+get-any(A, [RItem | List], [RItem |NewRest] ) :- get-any(A, List, NewRest).
+	
 perform_action(PrevState, move(X, Y, Z), NextState) :- 
 	delete(PrevState, clear(Z), MidS1),
 	delete(MidS1, on(X, Y), MidS2),
