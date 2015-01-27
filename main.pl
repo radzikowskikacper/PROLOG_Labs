@@ -16,6 +16,16 @@ main(Goals, Plan, FinalState):-
 	Plan, 
 	FinalState, 0).
 	
+main2(Goals, Plan, FinalState):-
+	plan([on( b5, b2), on( b4, p1), on( b1, b4),
+	on(b3, b1), on(b2, p3), 
+	clear(b5),
+	clear(b3),
+	clear(p2), clear(p4) ],
+	Goals, 
+	Plan, 
+	FinalState, 0).
+	
 % niedeterministyczny  wybór celu 
 
 choose_goal(Goal, [Goal | Rest], Rest, InitState) :- 
@@ -41,38 +51,48 @@ achieves(move(_, X, _), clear(X / on(X, Y)), Y):-
 requires(move(X, A, Z), [clear(X), clear(Z), on(X, A)], _):-
   atomic(X), atomic(Z), !.
 
-requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / nill)], _):-
+requires(move(X, Y, Z), [clear(X / on(X, Y)), clear(Z / dist(X,Z))], _):-
   atomic(Y).
 
-requires(move(X, Y, Z), [clear(X / on(X, Y / on(Y, Target))), clear(Z / nill)], Target):-
+requires(move(X, Y, Z), [clear(X / on(X, Y / on(Y, Target))), clear(Z / dist(X,Z))], Target):-
   not(atomic(Y)).
 
 goals_achieved(Goals, State) :-
-	check_goal(Goals, NewGoals),
+	check_goal(Goals, NewGoals, Distinct),
 	my_subset(NewGoals, State),
+	distinct_pairs(Distinct),
     writeln('goals_achieved - ok').
 	
-check_goal([], _):-!.
-check_goal([G|Rest], NewGoals):-
-	parse(G, GList),
-	check_goal(Rest, RestNewGoals),
+check_goal([], [], []):-!.
+check_goal([G|Rest], NewGoals, Distinct):-
+	parse(G, GList, PartDis),
+	check_goal(Rest, RestNewGoals, RestDis),
+	append(PartDis, RestDis, Distinct),
 	append(GList, RestNewGoals, NewGoals).
 	
 	 
 
-parse(nill, []).
+parse(dist(A,B), [], [dist(A,B)]).
 
-parse(clear(X/C), [clear(X) | Rest]) :-
+parse(clear(X/C), [clear(X) | Rest], Distinct) :-
   nonvar(C),!,
-  parse(C, Rest).
+  parse(C, Rest, Distinct).
 
-parse(clear(X), [clear(X)]).
+parse(clear(X), [clear(X)], []).
 
-parse(on(X, Y/C),  [on(X, Y) | Rest]) :-
+parse(on(X, Y/C),  [on(X, Y) | Rest], []) :-
   nonvar(C),!,
-  parse(C, Rest).
+  parse(C, Rest, []).
 
-parse(on(X, Y),  [on(X, Y)]).
+parse(on(X, Y),  [on(X, Y)], []).
+
+
+distinct_pairs([]).
+distinct_pairs([dist(A,B)|Rest]):-
+	A\=B,
+	distinct_pairs(Rest).
+
+
 
 my_subset([], _) :- !.
 my_subset([A|GList], State):-
@@ -80,8 +100,9 @@ my_subset([A|GList], State):-
 	A = B,
 	my_subset(GList, SRest).
 
-get-any(A, [A | Rest], Rest).
+
 get-any(A, [RItem | List], [RItem |NewRest] ) :- get-any(A, List, NewRest).
+get-any(A, [A | Rest], Rest).
 	
 perform_action(PrevState, move(X, Y, Z), NextState) :- 
 	delete(PrevState, clear(Z), MidS1),
@@ -96,6 +117,7 @@ plan(State, Goals, [ ], State, _) :-
 	goals_achieved(Goals, State).
 
 plan(InitState, Goals, Plan, FinalState, Int):-
+	writeln(' '),
 	write('POZIOM '),
 	writeln(Int),
 	write('Cele:  '),
@@ -121,12 +143,13 @@ plan(InitState, Goals, Plan, FinalState, Int):-
 	writeln('procedura perform_action->'),
 	perform_action(MidState1, Action, MidState2),
 	
-	write('Reszta Celów: '),
+	write('Reszta Celow: '),
 	writeln(RestGoals),
 	writeln('procedura plan-2->'),
 	plan(MidState2, RestGoals, PostPlan, FinalState, NewInt),
 	
-	write('Powrót >> POZIOM '),
+	writeln(' '),
+	write('Powrot >> POZIOM '),
 	writeln(Int),
 	
 	writeln('procedura append->'),
